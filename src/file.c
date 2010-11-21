@@ -51,24 +51,6 @@ DxfThumbnail *dxf_thumbnail;
 
 
 /*!
- * \brief A adapted fscanf for reading text lines from a DXF file.
- * 
- * \return char* with the scanned data.
- */
-char *dxf_fscanf
-(
-        FILE *fp,
-        const char * template
-)
-{
-        char temp_string[255];
-
-        fscanf (fp, template, temp_string);
-        return strdup (temp_string);
-}
-
-
-/*!
  * \brief Function opens and reads a DXF file.
  * 
  * After opening the DXF file with the name \c filename the file is read
@@ -84,39 +66,16 @@ dxf_read_file
                 /*!< filename of input file (or device). */
 )
 {
-        char temp_string[255];
+        char temp_string[DXF_MAX_STRING_LENGTH];
+        DxfFile *fp;
 #if DEBUG
         fprintf (stderr, "[File: %s: line: %d] Entering dxf_read_file () function.\n", __FILE__, __LINE__);
 #endif
-        if (!filename)
-        {
-                fprintf (stderr, "Error: filename is not initialised (NULL pointer).\n");
-                return (EXIT_FAILURE);
-        }
-        if (strcmp (filename, "") == 0)
-        {
-                fprintf (stderr, "Error: filename contains an empty string.\n");
-                return (EXIT_FAILURE);
-        }
-        FILE *fp;
-        fp = fopen (filename, "r");
-        if (!fp)
-        {
-                fprintf (stderr, "Error: could not open file: %s for reading (NULL pointer).\n",
-                        filename);
-                return (EXIT_FAILURE);
-        }
-        dxf_read_init();
-        while (!ferror (fp))
+        /* open the file */
+        fp = dxf_read_init (filename);
+        while (fp)
         {
                 dxf_read_line (temp_string, fp);
-                if (ferror (fp))
-                {
-                        fprintf (stderr, "Error: while reading from: %s in line: %d.\n",
-                                filename, __DXF_LINE_READ__);
-                        fclose (fp);
-                        return (EXIT_FAILURE);
-                }
                 if (strcmp (temp_string, "999") == 0)
                 {
                         /* Flush dxf comments to stdout as some apps put meta
@@ -129,39 +88,32 @@ dxf_read_file
                 else if (strcmp (temp_string, "0") == 0)
                 {
                 /* Now follows some meaningfull dxf data. */
-                        while (!feof (fp))
+                        while (!feof (fp->fp))
                         {
                                 dxf_read_line (temp_string, fp);
-                                if (ferror (fp))
-                                {
-                                        fprintf (stderr, "Error: while reading line %d from: %s.\n",
-                                                __DXF_LINE_READ__, filename);
-                                        fclose (fp);
-                                        return (EXIT_FAILURE);
-                                }
                                 if (strcmp (temp_string, "SECTION") == 0)
                                 {
                                          /* We have found the beginning of a
                                           * SECTION. */
-                                        dxf_read_section (filename, fp);
+                                        dxf_read_section (fp);
                                 }
                                 else
                                 {
                                          /* We were expecting a dxf SECTION and
                                           * got something else. */
                                         fprintf (stderr, "Warning: in line %d \"SECTION\" was expected, \"%s\" was found.\n",
-                                                __DXF_LINE_READ__, temp_string);
+                                                fp->line_number, temp_string);
                                 }
                         }
                 }
                 else
                 {
                         fprintf (stderr, "Warning: unexpected string encountered while reading line %d from: %s.\n",
-                                __DXF_LINE_READ__ , filename);
+                                fp->line_number , fp->filename);
                         return (EXIT_FAILURE);
                 }
         }
-        fclose (fp);
+        dxf_read_close (fp);
 #if DEBUG
         fprintf (stderr, "[File: %s: line: %d] Leaving dxf_read_file () function.\n", __FILE__, __LINE__);
 #endif
