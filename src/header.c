@@ -1041,7 +1041,6 @@ dxf_read_header_parse_string
         if (strcmp (temp_string, header_var) == 0 && version_expression)
         {
                 ret = FOUND;
-<<<<<<< HEAD
                 dxf_read_scanf (fp, "%i\n%s\n", &n, tstring);
                 if (dxf_read_is_string(n))
                 {
