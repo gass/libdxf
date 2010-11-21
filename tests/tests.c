@@ -1,7 +1,7 @@
 /*!
- * \file section.h
- * \author Copyright (C) 2010 by Bert Timmerman <bert.timmerman@xs4all.nl>.
- * \brief Definition of a DXF section entity (\c SECTION).
+ * \file tests.c
+ * \author Copyright (C) 2010 by Luis Matos <gass@otiliamatos.ath.cx>.\n
+ * \brief Tests for libdxf.
  *
  * <hr>
  * <h1><b>Copyright Notices.</b></h1>\n
@@ -29,17 +29,19 @@
  * <hr>
  */
 
+#include <string.h>
+#include "../src/file.h"
 
-#ifndef SECTION_H
-#define SECTION_H
-
-
-int dxf_read_section (char *filename, FILE *fp);
-int dxf_write_section (FILE *fp, char *section_name);
-int dxf_write_endsection (FILE *fp);
-
-
-#endif /* SECTION_H */
-
-
-/* EOF */
+int main (void)
+{
+    /*
+     * Reads a dxf file using libdxf form examples dir.
+     */
+    /* Version 2000 */
+    if (dxf_read_file ("../examples/qcad-example_R2000.dxf"))
+        fprintf (stdout, "TESTS: R2000 exited with error\n");
+    else
+        fprintf (stdout, "TESTS: R2000 exited with no error\n");
+    
+    return 1;
+}

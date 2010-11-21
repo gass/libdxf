@@ -33,12 +33,14 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-
+#include <stdarg.h>
 #include "global.h"
 
 
 /* macro to return if the expression is false */
 #define dxf_return_val_if_fail(expr, val) if (!expr) return val;
+
+#define __DXF_LINE_READ__ dxf_read_get_line_count ()
 
 /* macro to return according to the expression */
 enum return_state { FAIL = 0, SUCCESS, FOUND };
@@ -54,10 +56,12 @@ enum return_state { FAIL = 0, SUCCESS, FOUND };
 	}
 
 int dxf_read_is_double (int type);
-int dxf_raed_is_int (int type);
+int dxf_read_is_int (int type);
 int dxf_read_is_string (int type);
-
-
+int dxf_read_line (char * temp_string, FILE *fp);
+int dxf_read_scanf (FILE *fp, const char *template, ...);
+void dxf_read_init(void);
+int dxf_read_get_line_count(void);
 #endif /* UTIL_H */
 
 

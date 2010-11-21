@@ -41,6 +41,7 @@
 #include "thumbnail.h"
 #include "eof.h"
 #include "file.h"
+#include "util.h"
 
 
 char *dxf_entities_list;
@@ -84,7 +85,6 @@ dxf_read_file
 )
 {
         char temp_string[255];
-        int line_number;
 #if DEBUG
         fprintf (stderr, "[File: %s: line: %d] Entering dxf_read_file () function.\n", __FILE__, __LINE__);
 #endif
@@ -106,13 +106,14 @@ dxf_read_file
                         filename);
                 return (EXIT_FAILURE);
         }
-        line_number = 1;
+        dxf_read_init();
         while (!ferror (fp))
         {
+                dxf_read_line (temp_string, fp);
                 if (ferror (fp))
                 {
                         fprintf (stderr, "Error: while reading from: %s in line: %d.\n",
-                                filename, line_number);
+                                filename, __DXF_LINE_READ__);
                         fclose (fp);
                         return (EXIT_FAILURE);
                 }
@@ -122,8 +123,7 @@ dxf_read_file
                          * data regarding the correct loading of libraries in
                          * front of dxf data (sections, tables, entities etc.
                          */
-                        line_number++;
-                        fscanf (fp, "%s\n", temp_string);
+                        dxf_read_line (temp_string, fp);
                         fprintf (stdout, "DXF comment: %s\n", temp_string);
                 }
                 else if (strcmp (temp_string, "0") == 0)
@@ -131,12 +131,11 @@ dxf_read_file
                 /* Now follows some meaningfull dxf data. */
                         while (!feof (fp))
                         {
-                                line_number++;
-                                fscanf (fp, "%s\n", temp_string);
+                                dxf_read_line (temp_string, fp);
                                 if (ferror (fp))
                                 {
                                         fprintf (stderr, "Error: while reading line %d from: %s.\n",
-                                                line_number, filename);
+                                                __DXF_LINE_READ__, filename);
                                         fclose (fp);
                                         return (EXIT_FAILURE);
                                 }
@@ -144,21 +143,22 @@ dxf_read_file
                                 {
                                          /* We have found the beginning of a
                                           * SECTION. */
-                                        dxf_read_section (filename, fp, line_number);
+                                        dxf_read_section (filename, fp);
                                 }
                                 else
                                 {
                                          /* We were expecting a dxf SECTION and
                                           * got something else. */
                                         fprintf (stderr, "Warning: in line %d \"SECTION\" was expected, \"%s\" was found.\n",
-                                                line_number, temp_string);
+                                                __DXF_LINE_READ__, temp_string);
                                 }
                         }
                 }
                 else
                 {
                         fprintf (stderr, "Warning: unexpected string encountered while reading line %d from: %s.\n",
-                                line_number, filename);
+                                __DXF_LINE_READ__ , filename);
+                        return (EXIT_FAILURE);
                 }
         }
         fclose (fp);
