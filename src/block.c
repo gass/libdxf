@@ -130,7 +130,7 @@ dxf_block_read
 (
         char *filename,
                 /*!< filename of input file (or device). */
-        FILE *fp,
+        DxfFile *fp,
                 /*!< current line number in the input file (or device). */
         DxfBlock *dxf_block,
                 /*!< DXF block entity. */
@@ -151,13 +151,6 @@ dxf_block_read
         dxf_read_line (temp_string, fp);
         while (strcmp (temp_string, "0") != 0)
         {
-                if (ferror (fp))
-                {
-                        fprintf (stderr, "Error in dxf_block_read () while reading from: %s in line: %d.\n",
-                                filename, __DXF_LINE_READ__);
-                        fclose (fp);
-                        return (EXIT_FAILURE);
-                }
                 if (strcmp (temp_string, "1") == 0)
                 {
                         /* Now follows a string containing a external
@@ -281,7 +274,7 @@ dxf_block_read
                 else
                 {
                         fprintf (stderr, "Warning: in dxf_block_read () unknown string tag found while reading from: %s in line: %d.\n",
-                                filename, __DXF_LINE_READ__);
+                                filename, fp->line_number);
                 }
         }
 #if DEBUG

@@ -47,7 +47,6 @@
 #include <math.h>
 #include <errno.h>
 
-
 /*!
  * Debugging on/off toggle.
  */
@@ -61,6 +60,15 @@
 #define TRUE 1
 
 #define FALSE 0
+
+
+typedef struct
+dxf_file
+{
+    FILE *fp; /*!< File handler */
+    char *filename; /*!< Dxf filename */
+    int line_number; /*!< Dxf Last line read */
+} DxfFile, * DxfFilePtr;
 
 /* AutoCAD(TM) versions by name */
 #define AutoCAD_10 1006

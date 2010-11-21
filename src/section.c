@@ -44,7 +44,7 @@ dxf_read_section
 (
         char *filename,
                 /*!< filename of input file (or device). */
-        FILE *fp
+        DxfFile *fp
                 /*!< filepointer to the input file (or device). */
 )
 {
@@ -61,25 +61,11 @@ dxf_read_section
                 return (EXIT_FAILURE);
         }
         dxf_read_line (temp_string, fp);
-        if (ferror (fp))
-        {
-                fprintf (stderr, "Error: while reading from: %s in line: %d.\n",
-                        filename, __DXF_LINE_READ__);
-                fclose (fp);
-                return (EXIT_FAILURE);
-        }
         if (strcmp (temp_string, "2") == 0)
         {
-                while (!feof (fp))
+                while (!feof (fp->fp))
                 {
                         dxf_read_line (temp_string, fp);
-                        if (ferror (fp))
-                        {
-                                fprintf (stderr, "Error: while reading line %d from: %s.\n",
-                                        __DXF_LINE_READ__, filename);
-                                fclose (fp);
-                                return (EXIT_FAILURE);
-                        }
                         if (strcmp (temp_string, "HEADER") == 0)
                         {
                                 /* We have found the begin of the HEADER section. */
@@ -124,7 +110,7 @@ dxf_read_section
         else
         {
                 fprintf (stderr, "Warning: unexpected string encountered while reading line %d from: %s.\n",
-                        __DXF_LINE_READ__, filename);
+                        fp->line_number, filename);
         }
 #if DEBUG
         fprintf (stderr, "[File: %s: line: %d] Leaving dxf_read_section () function.\n", __FILE__, __LINE__);
