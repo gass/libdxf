@@ -42,6 +42,6 @@ int main (void)
         fprintf (stdout, "TESTS: R2000 exited with error\n");
     else
         fprintf (stdout, "TESTS: R2000 exited with no error\n");
-    
+
     return 1;
 }
