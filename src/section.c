@@ -49,6 +49,7 @@ dxf_read_section
         char temp_string[255];
         DxfHeader dxf_header;
         DxfBlock dxf_block;
+        char *dxf_entities_list = NULL;
 #if DEBUG
         fprintf (stderr, "[File: %s: line: %d] Entering dxf_read_section () function.\n", __FILE__, __LINE__);
 #endif
@@ -91,7 +92,11 @@ dxf_read_section
                         else if (strcmp (temp_string, "ENTITIES") == 0)
                         {
                                 /* We have found the begin of the ENTITIES sction. */
-                                /*! \todo Invoke a function for parsing the \c ENTITIES section. */ 
+                                dxf_read_entities (fp->filename,
+                                                   fp->fp,
+                                                   fp->line_number,
+                                                   dxf_entities_list,
+                                                   dxf_header._AcadVer);
                         }
                         else if (strcmp (temp_string, "OBJECTS") == 0)
                         {
