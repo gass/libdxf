@@ -79,7 +79,7 @@ dxf_read_section
                                 /* We have found the begin of the BLOCKS sction. */
 
                                 /* FIXME experimental usage of block_read */
-                                dxf_block_read (fp->fp,
+                                dxf_block_read (fp,
                                                 &dxf_block,
                                                 dxf_header._AcadVer);
                         }
